@@ -14,13 +14,14 @@ namespace SystemPerformanceAnalyser.ViewModels
 {
     public class MainViewModel : BindableBase
     {
-        private const int FixPlotWidth = 750;
-        private const int FixPlotHeight = 550;
+        private const int FixPlotWidth = 1000;
+        private const int FixPlotHeight = 600;
 
         private readonly IOpenFileService _openFileService;
         private CsvFromFileService? CsvFromFileService;
 
         private string _title = "";
+        private string _plotTitle = "";
         private int _plotWidth;
         private int _plotHeight;
         private PlotModel _plotModel = new();
@@ -43,6 +44,12 @@ namespace SystemPerformanceAnalyser.ViewModels
         {
             get => _title;
             set => SetProperty(ref _title, value);
+        }
+
+        public string PlotTitle
+        {
+            get => _plotTitle;
+            set => SetProperty(ref _plotTitle, value);
         }
 
         public int PlotWidth
@@ -79,17 +86,20 @@ namespace SystemPerformanceAnalyser.ViewModels
 
         private void CheckBoxActivityHandler(CheckableItem<string> obj)
         {
-            var legend = new List<string>();
+            var dataSets = new Dictionary<string, string>();
             foreach(var item in CheckableItems)
             {
-                if (item.EnableLeftAxis)
+                if (item.IsCheckedLeftAxis)
                 {
-                    legend.Add(item.Value);
+                    dataSets.Add(item.Value, "primary");
+                } else if (item.IsCheckedRightAxis)
+                {
+                    dataSets.Add(item.Value, "secondary");
                 }
             }
-            if (CsvFromFileService is not null && legend.Count > 0)
+            if (CsvFromFileService is not null && dataSets.Count > 0)
             {
-                PlotModel = PlotModelHelper.CreateTimeSeriesPlot(legend, CsvFromFileService.DataFrame);
+                PlotModel = PlotModelHelper.CreateTimeSeriesPlot(dataSets, CsvFromFileService.DataFrame);
             } else
             {
                 PlotModel.Series.Clear();
@@ -111,11 +121,11 @@ namespace SystemPerformanceAnalyser.ViewModels
 
                     var headers = CsvFromFileService.GetCsvHeader();
                     var checkableItems = new List<CheckableItem<string>>();
-                    foreach (var head in headers)
+                    foreach (var header in headers)
                     {
-                        if (head != "TimeStamp")
+                        if (CsvFromFileService.DataFrame.Columns[header].IsNumericColumn() && header != "TimeStamp")
                         {
-                            checkableItems.Add(new CheckableItem<string>(head));
+                            checkableItems.Add(new CheckableItem<string>(header));
                         }
                     }
                     CheckableItems = checkableItems;

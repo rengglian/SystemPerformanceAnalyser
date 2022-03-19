@@ -11,7 +11,7 @@ namespace SystemPerformanceAnalyser.Helper
 {
     public class PlotModelHelper
     {
-        public static PlotModel CreateTimeSeriesPlot(List<string> legend, DataFrame dataFrame)
+        public static PlotModel CreateTimeSeriesPlot(Dictionary<string, string> dataSets, DataFrame dataFrame)
         {
             var timeStamps = dataFrame.Columns["TimeStamp"].Cast<DateTime>().ToArray();
             var startDate = timeStamps.First();
@@ -25,15 +25,21 @@ namespace SystemPerformanceAnalyser.Helper
                 PlotMargins = new OxyThickness(50, 0, 0, 40)
             };
 
-            foreach (string item in legend)
+            bool hasLeftAxis = false;
+            bool hasRightAxis = false; 
+
+            foreach (KeyValuePair<string, string> item in dataSets)
             {
+                if (item.Value == "primary") hasLeftAxis = true;
+                if (item.Value == "secondary") hasRightAxis = true;
+
                 var ls = new LineSeries { 
-                    Title = item,
+                    Title = item.Key,
                     LineStyle = LineStyle.Solid,
-                   
+                    YAxisKey = item.Value
                 };
 
-                var values = dataFrame.Columns[item].Cast<float>().ToArray();
+                var values = dataFrame.Columns[item.Key].Cast<float>().ToArray();
                 for (int i = 0; i < values.Length; i++)
                 {
                     ls.Points.Add(DateTimeAxis.CreateDataPoint(timeStamps[i], values[i]));
@@ -41,14 +47,28 @@ namespace SystemPerformanceAnalyser.Helper
                 tmp.Series.Add(ls);
             }
 
-            var y_axis = new LinearAxis
+            if(hasLeftAxis)
             {
-                Position = AxisPosition.Left,
-                MajorGridlineStyle = LineStyle.Solid,
-                MinorGridlineStyle = LineStyle.LongDash,
-            };
+                var y_axis_left = new LinearAxis
+                {
+                    Position = AxisPosition.Left,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MinorGridlineStyle = LineStyle.LongDash,
+                    Key = "primary"
+                };
+                tmp.Axes.Add(y_axis_left);
+            }
 
-            tmp.Axes.Add(y_axis);
+            if(hasRightAxis)
+            {
+                var y_axis_right = new LinearAxis
+                {
+                    Position = AxisPosition.Right,
+                    Key = "secondary"
+                };
+                tmp.Axes.Add(y_axis_right);
+            }
+
 
             var x_axis = new DateTimeAxis
             {
@@ -65,8 +85,9 @@ namespace SystemPerformanceAnalyser.Helper
             tmp.Legends.Add(new Legend
             {
                 LegendTitle = "Legend",
-                LegendPosition = LegendPosition.TopRight,
-                LegendPlacement = LegendPlacement.Outside
+                LegendPosition = LegendPosition.RightTop,
+                LegendPlacement = LegendPlacement.Outside,
+                LegendMargin = 35
             });
 
             return tmp;

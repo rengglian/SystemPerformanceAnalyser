@@ -5,8 +5,10 @@ namespace SystemPerformanceAnalyser.Model
     public class CheckableItem<T> : BindableBase
     {
         private T _value;
-        private bool _enableLeftAxis;
-        private bool _enableRightAxis;
+        private bool _isCheckedLeftAxis;
+        private bool _isCheckedRightAxis;
+        private bool _enableLeftAxis = true;
+        private bool _enableRightAxis = true;
         public CheckableItem(T value)
         {
             _value = value;
@@ -18,15 +20,34 @@ namespace SystemPerformanceAnalyser.Model
             set => SetProperty(ref _value, value);
         }
 
+        public bool IsCheckedLeftAxis
+        {
+            get => _isCheckedLeftAxis;
+            set
+            {
+                SetProperty(ref _isCheckedLeftAxis, value);
+                EnableRightAxis = !_isCheckedLeftAxis;
+            }
+        }
+        public bool IsCheckedRightAxis
+        {
+            get => _isCheckedRightAxis;
+            set
+            {
+                SetProperty(ref _isCheckedRightAxis, value);
+                EnableLeftAxis = !_isCheckedRightAxis;
+            }
+        }
+
         public bool EnableLeftAxis
         {
-            get => _enableLeftAxis;
-            set => SetProperty(ref _enableLeftAxis, value);
+            get { return _enableLeftAxis; }
+            set { SetProperty(ref _enableLeftAxis, value); }
         }
         public bool EnableRightAxis
         {
-            get => _enableRightAxis;
-            set => SetProperty(ref _enableRightAxis, value);
+            get { return _enableRightAxis; }
+            set { SetProperty(ref _enableRightAxis, value); }
         }
     }
 }
