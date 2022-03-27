@@ -9,6 +9,7 @@ namespace SystemPerformanceAnalyser.Model
         private bool _isCheckedRightAxis;
         private bool _enableLeftAxis = true;
         private bool _enableRightAxis = true;
+
         public CheckableItem(T value)
         {
             _value = value;
@@ -29,6 +30,7 @@ namespace SystemPerformanceAnalyser.Model
                 EnableRightAxis = !_isCheckedLeftAxis;
             }
         }
+
         public bool IsCheckedRightAxis
         {
             get => _isCheckedRightAxis;
@@ -44,6 +46,7 @@ namespace SystemPerformanceAnalyser.Model
             get { return _enableLeftAxis; }
             set { SetProperty(ref _enableLeftAxis, value); }
         }
+
         public bool EnableRightAxis
         {
             get { return _enableRightAxis; }

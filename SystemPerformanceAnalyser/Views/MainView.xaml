@@ -5,73 +5,138 @@
         xmlns:prism="http://prismlibrary.com/"
         xmlns:oxy="http://oxyplot.org/wpf"
         prism:ViewModelLocator.AutoWireViewModel="true"
-        Title="{Binding Title}" Height="800" Width="1300">
+        Title="{Binding Title}" Height="800" Width="1400">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
+        <Menu DockPanel.Dock="Top" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+            <MenuItem Header="File">
+                <MenuItem Header="Open csv..." Command="{Binding LoadFileCommand}"/>
+                <Separator/>
+                <MenuItem Header="Save plot..." Command="{Binding ExportCommand}" CommandParameter="{Binding ElementName=PlotModel}"/>
+                <Separator/>
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Edit Annotations..." Command="{Binding EditAnnotationCommand}"/>
+                <Separator/>
+                <MenuItem Header="Update Statistics..." Command="{Binding UpdateStatisticsCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Help">
 
-        <Button Grid.Row="0" Grid.Column="0" Margin="10" Height="50" Width="200" Content="Open File" Command="{Binding LoadFileCommand}"/>
+            </MenuItem>
+        </Menu>
+        <Expander Grid.Row="1" Grid.Column="0" IsExpanded="True" ExpandDirection="Right">
+            <ItemsControl Margin="10" ItemsSource="{Binding CheckableItems}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="0" Grid.Column="1">
+                            <CheckBox Grid.Row="0" Grid.Column="0" Margin="5" IsEnabled="{Binding EnableLeftAxis}"
+                                      IsChecked="{Binding IsCheckedLeftAxis}" 
+                                      Command="{Binding Path=DataContext.CheckBoxActivity, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}"
+                                      CommandParameter="{Binding}"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Text="{Binding Value}"/>
+                            <CheckBox Grid.Row="0" Grid.Column="2" Margin="5"  IsEnabled="{Binding EnableRightAxis}"
+                                    IsChecked="{Binding IsCheckedRightAxis}" 
+                                    Command="{Binding Path=DataContext.CheckBoxActivity, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}"
+                                    CommandParameter="{Binding}"/>
+                        </Grid>
+
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Expander>
+        <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="ResultView">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Plot Title:"/>
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="X Axis Lable:"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Text="Left Axis Lable:"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="Right Axis Lable:"/>            
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PlotTitle}" />
-            <Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Margin="10" Height="50" Width="200" Content="Set Properties File" Command="{Binding LoadFileCommand}"/>
-        </Grid>
-
-        <ItemsControl Grid.Row="1" Margin="10" Grid.Column="0" ItemsSource="{Binding CheckableItems}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
+            <oxy:PlotView Grid.Row="0" Grid.Column="0"
+                Name="PlotModel" 
+                Model="{Binding PlotModel}"/>
+            <Expander Grid.Row="0" Grid.Column="1" IsExpanded="false" ExpandDirection="Left">
+                <GroupBox Header="Statistics">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <CheckBox Grid.Row="0" Grid.Column="0" Margin="5" IsEnabled="{Binding EnableLeftAxis}"
-                                  IsChecked="{Binding IsCheckedLeftAxis}" 
-                                  Command="{Binding Path=DataContext.CheckBoxActivity, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}"
-                                  CommandParameter="{Binding}"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Text="{Binding Value}"/>
-                        <CheckBox Grid.Row="0" Grid.Column="2" Margin="5"  IsEnabled="{Binding EnableRightAxis}"
-                                IsChecked="{Binding IsCheckedRightAxis}" 
-                                Command="{Binding Path=DataContext.CheckBoxActivity, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}"
-                                CommandParameter="{Binding}"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Start Time:"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="End Time:"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Datapoints:"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="View Start Time:"/>
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="View Time:"/>
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="View Datapoints:"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding DataStatistics.StartTime}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DataStatistics.EndTime}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DataStatistics.TotalDataPoints}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DataStatistics.SectionStart}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding DataStatistics.SectionEnd}"/>
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding DataStatistics.SectionDataPoints}"/>
+                        <ItemsControl Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding DataStatistics.SeriesCharacteristics}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Name}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Min"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Max"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Mean"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Median"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Slope"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Std"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Name}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Min, StringFormat=N2}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Max, StringFormat=N2}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Mean, StringFormat=N2}"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Median, StringFormat=N2}"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Slope, StringFormat=N2}"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding StandardDeviation, StringFormat=N2}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Grid>
-
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-
-        <Grid Grid.Row="1" Grid.Column="1">
-            <oxy:PlotView 
-                Name="PlotModel" 
-                Model="{Binding PlotModel}" 
-                Width="{Binding PlotWidth}" 
-                Height="{Binding PlotHeight}" 
-                VerticalAlignment="Top" 
-                HorizontalAlignment="Center"/>
+                </GroupBox>
+            </Expander>
         </Grid>
 
         <TextBlock Grid.Row="2" Grid.Column="1" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Text="{Binding Information}"/>

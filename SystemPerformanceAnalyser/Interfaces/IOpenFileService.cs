@@ -3,6 +3,7 @@
     public interface IOpenFileService
     {
         public bool? OpenFile();
-        public string[] FileNames { get; }
+        public string File { get; }
+        public string FileName { get; }
     }
 }

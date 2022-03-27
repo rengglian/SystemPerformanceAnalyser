@@ -11,7 +11,8 @@ namespace SystemPerformanceAnalyser.Helper
 {
     public class PlotModelHelper
     {
-        public static PlotModel CreateTimeSeriesPlot(Dictionary<string, string> dataSets, DataFrame dataFrame)
+        public enum AxisType { PrimaryY, SecondaryY, XAxis };
+        public static PlotModel CreateTimeSeriesPlot(Dictionary<string, AxisType> dataSets, DataFrame dataFrame)
         {
             var timeStamps = dataFrame.Columns["TimeStamp"].Cast<DateTime>().ToArray();
             var startDate = timeStamps.First();
@@ -26,17 +27,17 @@ namespace SystemPerformanceAnalyser.Helper
             };
 
             bool hasLeftAxis = false;
-            bool hasRightAxis = false; 
-
-            foreach (KeyValuePair<string, string> item in dataSets)
+            bool hasRightAxis = false;
+            
+            foreach (KeyValuePair<string, AxisType> item in dataSets)
             {
-                if (item.Value == "primary") hasLeftAxis = true;
-                if (item.Value == "secondary") hasRightAxis = true;
+                if (item.Value == AxisType.PrimaryY) hasLeftAxis = true;
+                if (item.Value == AxisType.SecondaryY) hasRightAxis = true;
 
                 var ls = new LineSeries { 
                     Title = item.Key,
                     LineStyle = LineStyle.Solid,
-                    YAxisKey = item.Value
+                    YAxisKey = $"{item.Value}",
                 };
 
                 var values = dataFrame.Columns[item.Key].Cast<float>().ToArray();
@@ -54,7 +55,7 @@ namespace SystemPerformanceAnalyser.Helper
                     Position = AxisPosition.Left,
                     MajorGridlineStyle = LineStyle.Solid,
                     MinorGridlineStyle = LineStyle.LongDash,
-                    Key = "primary"
+                    Key = $"{AxisType.PrimaryY}",
                 };
                 tmp.Axes.Add(y_axis_left);
             }
@@ -64,11 +65,10 @@ namespace SystemPerformanceAnalyser.Helper
                 var y_axis_right = new LinearAxis
                 {
                     Position = AxisPosition.Right,
-                    Key = "secondary"
+                    Key = $"{AxisType.SecondaryY}",
                 };
                 tmp.Axes.Add(y_axis_right);
             }
-
 
             var x_axis = new DateTimeAxis
             {
@@ -78,8 +78,10 @@ namespace SystemPerformanceAnalyser.Helper
                 StringFormat = "yyyy.MM.dd HH:mm:ss",
                 Angle = 15,
                 MajorGridlineStyle = LineStyle.Solid,
-                MinorGridlineStyle = LineStyle.LongDash
+                MinorGridlineStyle = LineStyle.LongDash,
+                Key = $"{AxisType.XAxis}",
             };
+
             tmp.Axes.Add(x_axis);
 
             tmp.Legends.Add(new Legend
@@ -91,6 +93,27 @@ namespace SystemPerformanceAnalyser.Helper
             });
 
             return tmp;
+        }
+
+        public static void ChangeAxisTitle(PlotModel plotModel, string title, AxisType axisType)
+        {
+            var axis = plotModel.Axes.FirstOrDefault(axis => axis.Key == $"{axisType}");
+            if (axis == null)
+                return;
+            axis.Title = title;
+        }
+
+        public static string GetAxisTitle(PlotModel plotModel, AxisType axisType)
+        {
+            var axis = plotModel.Axes.FirstOrDefault(axis => axis.Key == $"{axisType}");
+            if (axis == null)
+                return "";
+            return axis.Title;
+        }
+
+        public static DateTime GetDateTimeFromAxis(double xAxisPosition)
+        {
+           return DateTimeAxis.ToDateTime(xAxisPosition);
         }
     }
 }

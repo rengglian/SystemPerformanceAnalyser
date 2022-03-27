@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System.IO;
 using SystemPerformanceAnalyser.Interfaces;
 
 namespace SystemPerformanceAnalyser.Services
@@ -16,11 +17,13 @@ namespace SystemPerformanceAnalyser.Services
             var choosenFile = _openFileDialog.ShowDialog();
             if (choosenFile.HasValue && choosenFile.Value)
             {
-                FileNames = _openFileDialog.FileNames;
+                File = _openFileDialog.FileNames[0];
+                FileName = Path.GetFileName(File);
             }
             return choosenFile;
         }
 
-        public string[] FileNames { get; private set; }
+        public string File { get; private set; }
+        public string FileName { get; private set; }
     }
 }

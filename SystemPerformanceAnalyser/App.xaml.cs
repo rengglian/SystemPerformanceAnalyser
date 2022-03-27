@@ -1,6 +1,8 @@
 ﻿using Prism.Ioc;
 using Prism.Unity;
 using System.Windows;
+using SystemPerformanceAnalyser.Dialogs.Annotations.ViewModels;
+using SystemPerformanceAnalyser.Dialogs.Annotations.Views;
 using SystemPerformanceAnalyser.Interfaces;
 using SystemPerformanceAnalyser.Services;
 using SystemPerformanceAnalyser.Views;
@@ -20,6 +22,9 @@ namespace SystemPerformanceAnalyser
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterManySingleton<OpenFileService>(typeof(IOpenFileService));
+            containerRegistry.RegisterManySingleton<SaveFileService>(typeof(ISaveFileService));
+
+            containerRegistry.RegisterDialog<AnnotationDialogView, AnnotationDialogViewModel>();
         }
     }
 }
